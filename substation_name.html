@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Condition Monitoring Entry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #0a0f2c;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 10px;
+    }
+    h1 {
+      color: #00f2ff;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 0 0 10px #00f2ff;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      color: #00f2ff;
+      font-size: 18px;
+    }
+    select, input[type="text"], input[type="date"] {
+      width: 90vw;
+      max-width: 400px;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 2px solid #00f2ff;
+      font-size: 16px;
+      font-family: Cambria, serif;
+      outline: none;
+      background-color: #111836;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+      transition: box-shadow 0.3s, transform 0.2s;
+    }
+    select:focus, input[type="text"]:focus, input[type="date"]:focus {
+      box-shadow: 0 0 15px #00f2ff;
+      transform: scale(1.02);
+    }
+    button.go {
+      margin-top: 30px;
+      background-color: #00ff9f;
+      color: #000;
+      padding: 12px 35px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ff9f;
+      font-family: 'Orbitron', sans-serif;
+    }
+    button.go:hover {
+      background-color: #5cffc1;
+      transform: scale(1.05);
+    }
+    button.back {
+      margin-top: 10px;
+      background-color: #00f2ff;
+      color: #000;
+      padding: 12px 35px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00f2ff;
+      font-family: 'Orbitron', sans-serif;
+    }
+    button.back:hover {
+      background-color: #0ff;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>New Condition Monitoring Entry</h1>
+
+<label for="zone">Zone Name</label>
+<select id="zone" onchange="updateRegions()">
+  <option value="Kolkata Zone" selected>Kolkata Zone</option>
+  <option value="Siliguri Zone">Siliguri Zone</option>
+  <option value="Malda Zone">Malda Zone</option>
+  <option value="Berhampore Zone">Berhampore Zone</option>
+  <option value="Burdwan Zone">Burdwan Zone</option>
+  <option value="Midnapur Zone">Midnapur Zone</option>
+</select>
+
+  <label for="region">Region Name</label>
+  <select id="region" onchange="updateDivisions()"></select>
+
+  <label for="division">Division Name</label>
+  <select id="division" onchange="updateSubstations()"></select>
+
+  <label for="substation">Sub-station Name</label>
+  <select id="substation"></select>
+
+  <label for="date">Date of Entry</label>
+  <input type="date" id="entryDate" />
+
+  <button class="go" onclick="saveAndGo()">Go</button>
+  <button class="back" onclick="window.location.href='main_menu.html'">Back</button>
+
+  <script>
+    function saveAndGo() {
+      const substation = document.getElementById("substation").value;
+      localStorage.setItem("selectedSubstation", substation);
+      window.location.href = "select_area.html";
+    }
+
+
+const data = {
+
+// Kolkata Zone
+
+
+      "Bidhannagar Region": {
+        "Bidhannagar-I Division": ["M-1 Substation", "M-2 Substation", "M-3 Substation", "H- Substation", "B- Substation", "SRC Substation", "A-13 Substation", "Mahisbathan Substation", "M-5 Substation", "ERTL Substation", "Ideal Aqua View"],
+        "Bidhannagar-I Switching": ["Stadium Switching Substation", "EE Switching Substation", "G Switching Substation", "A Switching Substation", "C Switching Substation", "D Switching Substation", "I Switching Substation", "J Switching Substation", "K Switching Substation", "Q Switching Substation", "R Switching Substation", "1 Switching Substation", "2 Switching Substation", "3 Switching Substation", "4 Switching Substation", "E Switching Substation", "F Switching Substation"],
+        "Bidhannagar-II Division": ["Siddha Happy Villa Substation", "Siddha Payne Substation", "Rajarhat Substation", "AWHO Substation", "Baguihati Substation", "Ghuni Substation", "Mandalganthi Substation", "Vedic Village Substation", "Chandiberia Substation", "NT AA 2E Substation", "One 10 Substation", "Mina Aurumn Substation", "Bisharpara Substation", "Narayanpur Substation", "Bagjola Substaion"],
+        "Newtown Division": ["NT AA 1DBPS Substation", "NT AA 2G Substation", "NT AA 3E Substation", "Sukhobristi 1 Substation", "Sukhobristi 2 Substation", "Uni World Substation", "CBD Substation", "NT AA 2B Substation", "Tata Avenida Substation", "DLF Substation", "NT AA 3B Substation", "NT AA 3C Substation", "NT AA 3G Substation", "NT AA 2A Substation", "NT AA 2C Substation", "NT AA 2D Substation", "Eilta Garden Vista Substation", "NT AA 1A Substation", "NT AA 1B Substation", "NT AA 1D Substation", "NT AA 1C Substation", "Silicon Valley Substation", "DSS-16 Substation"],
+        "Bhangar Division": ["KLC-2 Substation", "KLC-3 Substation", "Bhangar Substation", "Simoco Substation", "Sarberia Substation", "Jeliakhali Substation", "Chandaneswar Substation", "Minakhan Substation", "SouthCity Substation"]
+      },
+      "North 24 Parganas Region": {
+        "Barrackpur Division": ["Ghola Substation", "Dangapara Substation", "Khardah Substation", "KMDA Substation", "Mohanpur Substation", "Barrackpur Substation", "Mahishpota Substation", "Belgharia Substation", "Old Calcutta Substation", "Sajirhat Substation"],
+        "Barasat Division": ["Abdalpur Substation", "Barasat Substation", "Anantapur Substation", "Sisirkunja Substation", "Ganganagar Substation", "Larica Substation", "Bira Substation", "Regent Garment Substation", "Niganj Substation", "Jeerat Substation", "Kishalaya Substation", "Berachampa Subststaion", "Amdanga Substation"],
+        "Habra Division": ["KSM Substation", "Gaighata Substation", "Habra Substation", "Mogra Substation", "Banbania Substation", "Banipur Substation", "Gobardanga Substation"],
+        "Bongaon Division": ["Meherani Substation", "Helencha Substation", "Nataberia Substation", "Chandpara Substation", "Thakurnagar Substation", "Bongaon Substation"],
+        "Bashirhat Division": ["Hasnabad Substation", "Hingalganj Substation", "Nazat Substation", "Basirhat Substation", "Badartala Substation"],
+        "Baduria Division": ["Arbelia Substation", "Baduria Substation", "Serapole Substation", "Haroa Substation"],
+        "Naihati Division": ["Basudevpur Substation", "Chord Road Substation", "Panpur Substation", "Naihati Jute Mill Substation", "Rishi Bankim Substation", "Gouripur Substation", "Gowalaphatak Substation", "Kanchrapara Substation", "Halisahar Substation"]
+      },
+      "South 24 Parganas Region": {
+        "Garia Division": ["Narendrapur Substation", "Tollyganj Substation", "Southwinds Substation", "Megacity Substation", "Garia Substation", "Nepalganj Substation", "Renia Substation", "Gangajoara Substation", "kalikapur Substation", "Sonarpur Substation"],
+        "Baruipur Division": ["Beliachandi Substation", "Tongtola Substation", "Mograhat Substation", "Madarhat Substation", "Baruipur Substation", "Mahinagar Substation"],
+        "Joynagar Division": ["Jaynagar Substation", "Uttar Laxminarayanpur Substation", "Mojilpur Substation", "Kultali Substation", "Patharpratima Substation"],
+        "Canning Division": ["Uttarbhag Substation", "Jibantala Substation", "Dighirpar Substation", "Gosaba Substation", "Sonakhali Substation"],
+        "Behala Division": ["Birlapur Substation", "Deulberia Substation", "Paita Substation", "Amtala Substation", "Khariberia Substation", "Sirakole Substation", "Genex Valley Substation", "DTC Housing Substation"],
+        "Behala Switching": ["Switching- A Substation", "Swtching-B Substation", "Switching-C Substation"],
+        "Diamond Harbour Division": ["Sarisha Substation", "Falta Sec-2 Substation", "Falta Sec-3 Substation", "Falta Sec-4 Substation", "PDP Substation", "Chandpala Substation", "Deula Substation", "Kulpi Substation", "Simulberia Substation", "Diamond Harbour Substation", "Raichak Substation", "Nischintapur Substation"],
+        "Kakdwip Division": ["Kakdwip Substation", "Dakshin Shibganj Substation", "Radhanagar Substation", "Rudranagar Substation", "Namkhana Substation", "Achintyanagar Substation"]
+      },
+      "Howrah Region": {
+        "Howrah-I Division": ["Sankrail Utsab park Substation", "Bally Substation", "Belgachia Substation", "Liluah Substation", "Laxmanpur Substation", "Alampur Substation", "KWIC Substation", "Kona Substation", "Kona TT Substation", "Anmol Hosiery Park Substation", "Rubber Park Substation", "Baltikuri Substation"],
+        "Howrah-II Division": ["James Jewellary Substation", "Srijan Logistics Substation", "Jangalpur-I Substation", "Jangalpur-II Substation", "Singti Substation", "Sehaguri Substation", "Amta Substation", "Makardah Substation", "Munshirhat Substation", "Gumadandi Substation", "Domjhur GIS Substation"],
+        "Uluberia Division": ["Islampur Substation", "Food Park Substation", "Poly Park Substation", "Banitabla Substation", "Foundry Park Substation", "Shyampur Substation", "Baganda Substation", "Mugkalyan Substation", "Borogram Substation", "Ranihati Substation", "Sankrail Industrial Park Substation", "Ganesh Complex Substation", "UIGC Substation", "Bagnan Substation", "Kalyanpur Substation", "ESR Substation", "EFC Park Substation"]
+      },
+
+
+// Burdwan Zone
+
+
+  "Birbhum Region": {
+    "Bolpur Division": ["Ahmedpur Substation", "Bolpur Substation", "Bolpur GSS(Paruldanga gss) Substation", "Hatia Substation", "Ilam bazar Substation", "Khujutipara Substation", "Kirnahar Substation", "Lavpur Substation", "Mooldanga Substation", "Nanoor Substation", "Panswa Substation", "Sbibtala Substation", "Valuka Substation"],
+    "Rampurhat Division": ["Bahadurpur Substation", "Bhadrapur Substation", "Bhadrapur 132/33 KV GIS Substation", "Kastogora Substation", "Khorbuna Substation", "Kotasur Substation", "Margram Substation", "Mollarpur Substation", "Murarai Substation", "Nalhati Substation", "Paikar Substation", "Rajgram Substation", "Rampurhat Substation", "Rampurhat govt medical college and hospital Substation", "Rampurhat GSS Substation", "Sardha Substation"],
+    "Suri Division": ["Abdarpur Substation", "Bhimgarh Substation", "Dubrajpur Substation", "Duttapukur 33/11KV Substation", "Khayrasole Substation", "MD bazar Substation", "Muthaberia Substation", "Panchami Substation", "Panchami-II Substation", "Panrui Substation", "Purandarpur Substation", "Rajnagar Substation", "Sadaipur GSS Substation", "Sainthia GSS Substation", "Suri Substation"]
+  },
+  "Burdwan Region": {
+    "Burdwan North Division": ["Balgona Substation", "Bhanderdihi Substation", "Budbud Substation", "Galsi Substation", "Mahachanda GSS Substation", "Mankar GSS Substation", "Nasigram Substation", "Orgram Substation", "Ramnagar Substation", "Gushkara Substation"],
+    "Burdwan South Division": ["Burdwan 132 KV GIS Substation", "Annadata Temp Substation", "Becharhat Substation", "Chakpurohit Substation", "Katwa Road Substation", "KGN Temp Substation", "Khandagosh Substation", "Madhabdihi Substation", "Mandarpur 33/11KV Substation", "Nababhat Substation", "New Bongpur GIS Substation", "Power House Substation", "Raina GSS Substation", "Sadarghat Substation", "Seherabazar Substation", "Sharachi Substation", "Uchalon Temp Substation"],
+    "Kalna Division": ["Baidyapur Substation", "Bamunpara Substation", "Chatni Substation", "Kalna Substation", "Kalna GSS Substation", "Kusumgram Substation", "Modhupur Substation", "Mondalgram Substation", "Nadanghat Substation", "Srirampur(Nabadwip) Substation"],
+    "Katwa Division": ["Dainhat Substation", "Jogeshwardihi Substation", "Kandra Substation", "Katwa Substation", "Katwa GSS Substation", "Mejhiary Substation", "Mongalkote Substation", "Pachundi Substation"],
+    "Memari Division": ["Jougram Substation", "Bhagila Substation", "Hatgobindapur Substation", "Jamalpur Substation", "Memari Substation", "Paharhati Substation", "Saktigarh Substation", "Satgachia GSS Substation"]
+  },
+  "Hooghly Region": {
+    "Arambagh Division": ["Arambag GSS Substation", "Arambagh Town Substation", "Champadanga Substation", "Chandur Substation", "Dihibatpur Substation", "Gourhati Substation", "Khanakul Substation", "Laxmipur Substation", "Mayapur Substation", "Shantipur Substation", "Tarui Substation"],
+    "Chandannagar Division": [ "Adisaptagram GSS Substation", "Bighati Substation", "Bighati GSS Substation", "CESC Off Take Point Substation", "Chandannagar Substation", "Kodalia Substation", "Mankundu Substation", "Moghaltuli Substation", "Polba Substation", "Sahagunj Substation", "Sugandha Substation", "Taldanga Substation"],
+    "Mogra Division": ["Bainchi Substation", "Balagarh Substation", "Bansberia Substation", "BTPS Substation", "Inchura Substation", "Kalitala Substation", "Khanyan Substation", "Khanyan GSS Substation", "Pandua Substation", "Talandu Air Substation"],
+    "Singur-Haripal Division": ["Kaikala Substation", "Khasher Bheri Substation", "Malia Substation", "Singur Substation" ],
+    "Srirampore Division": ["Arrjavv Substation", "Chanditala GSS Substation", "Dankuni Coal Complex Substation", "HNG Substation", "Kalachara Substation", "Keventers Substation", "Mother Dairy Substation", "Raghunathpur(Hooghly) Substation", "Rishra Substation", "Sheoraphuly Substation", "Shriram Grand City" ],
+    "Tarakeshwar Division": ["Belmuri Substation", "Belmuri GSS Substation", "Dasghara Substation", "Harit Substation", "Jangipara Substation", "Jangipara GSS Substation", "Maheswarpur Substation", "Seakhala Substation", "Tarakeshwar GSS Substation", "Vastara Substation" ]
+  },
+  "Paschim Burdwan Region": {
+    "Asansol Division": ["Agnibina Substation", "Asansol 220/132/33 KV Substation", "Bogra Substation", "Dabour Substation", "Dendua Substation", "Domohini Substation", "Ismail Substation", "Jasaidihi Substation", "Kanyanpur-II(Bakidanga) Substation", "Kaynapur Substation", "Kuilapur Substation", "Mangalpur Substation", "Murgasole Substation", "Neamatpur Substation", "Raniganj CCC 11/11 kv Substation", "Sodepur Eclradhananagr Substation"],
+    "Durgapur Division": ["A Zone Substation", "AB Zone Substation", "B Zone Substation", "Bamunahara(DPL) Substation", "Bhiringhee Substation", "Bidhannagar Substation", "Bijoynagar Substation", "C Zone Substation", "C1 Zone Substation", "City Center Substation", "Coke Oven Substation", "Dakhinkhanda Substation", "Fuljore Substation", "Hemsheela Substation", "Ijjatgunj Substation", "Jamuria Substation", "Kalikapur Substation", "Kota Substation", "Lachipur Substation", "Mangalpur GSS Substation", "Nilkhanta Substation", "Panagarh GSS Substation", "Pandaveswar Substation", "Raghunathpur(Burdwan) Substation", "Rajbandh Substation", "Sankarpur Substation", "Ukhra GSS Substation"]
+  },
+
+
+// Midnapur Zone
+
+  "Bankura Region": {
+    "Bankura Division": ["Bankura GSS Substation", "Barjora Substation", "Barjora GSS Substation", "Beleatore Substation", "Chhatna Substation", "Gangajalghati Substation", "Jorehira Substation", "Kamalpur Substation", "Kenduadihi Substation", "Manjuria Substation", "Mejia Solar Substation", "Mejia Thermal Power Plant- Durlavpur-DVC Substation", "Nandanpur Substation", "New Saltora Substation", "Patpur Substation", "Patradanga Substation"],
+    "Bishnupur Division": ["Baital Substation", "Bakadha Substation", "Bishnupur GSS Substation", "Bishnupur(220) GSS Substation", "Dongalon Substation", "Indus Substation", "Indus 132 KV GIS Substation", "Joypur Substation", "Joyrambati Substation", "Kotulpur Substation", "Onda Substation", "Patrasayer Substation", "Radhanagar Substation", "Ramsagar Substation", "Rasulpur Substation", "Sonamukhi Substation"],
+    "Khatra Division": ["Barikul Substation", "Harmasra Substation", "Hirbadh Substation", "Indpur Substation", "Khatra Substation", "Khatra 132KV GSS Substation", "Moyna Substation", "Panchmura Substation", "Raipur Substation", "Ranibandh Substation", "Sarenga Substation", "Simlapal Substation", "Taldangra Substation"]
+  },
+
+  "Jhargram Region": {
+    "Jhargram Division": ["Belpahari Substation", "Binpur Substation", "Boria Substation", "Chilkigarh Substation", "Chingra Substation", "Gopiballavpur Substation", "Jhargram Substation", "Jhargram GSS Substation", "Lalgarh Substation", "Manikpara Substation", "Nayagram Substation", "Patni Solar 33KV Substation", "Sankrail Substation"]
+  },
+
+  "Purba Medinipur Region": {
+    "Contai Division": ["Contai GSS Substation", "Digha Substation", "Henria Substation", "Jinandipur Substation", "Kharipukuria Substation", "Kultalia Substation", "Malda Substation", "Mandarmoni Substation", "New Digha GIS Substation", "Ramnagar Substation", "Ramnagar GSS Substation", "Satmile Substation", "Udbadal Substation", "Uttar darua Substation"],
+    "Egra Division": ["Bajkul gss Substation", "Baranalgeria Substation", "Bhagawanpur Substation", "Chorepalia Substation", "Egra GSS Substation", "Junpukur Substation", "Kajlagarh Substation", "Pataspur Substation", "Purusottampur (Egra) Substation", "Saridaspur Substation", "South Khanda Substation"],
+    "Haldia Division": ["Amtaliya Substation", "Basudebpur Substation", "Chaitannapur Substation", "Chandipur Substation", "Dighasipur Substation", "Gopalpur Substation", "Haldia 132 GSS Substation", "Khudiramnagar Substation", "Medical College Substation", "New Haldia 220 GSS Substation", "NIZ GSS Substation", "Patikhali Substation", "Reyapara Substation"],
+    "Tamluk Division": ["Beraberia Substation", "Gopalnagar Substation", "Kanktia Substation", "Khanchi (Thekuachak) Substation", "Kolaghat GSS Substation", "Mechogram Substation", "Moyna Substation", "Nimtouri Substation", "Ratulia 33/11 kv ss Substation", "Tamluk Substation", "Tamluk GSS Substation"]
+  },
+
+ "Paschim Midnapur Region": {
+    "Belda Division": ["Belda Substation", "Gopinathpur Substation", "Keshiary Substation", "Keshiary 132/33KV Grid Substation", "Khandrui Datan II Substation", "Madan Mohanchak I Substation", "Mohanpur Substation", "Narayangarh Substation", "Rohini solar Substation", "Sarsanka(Datan) Substation"],
+    "Ghatal Division": ["Bhuniara Substation", "Birsingha GSS Substation", "C K Town Substation", "Chandrakona Road GSS Substation", "Khirpai Substation", "Khukurdaha Un-manned 33/11 KV Substation", "Kushpata Substation", "Kuthighat Substation", "Narajole Substation", "Nirmal Bazar Substation", "Srinagar Substation", "Sultannagar Substation"],
+    "Kharagpur Division": ["Bargokulpur Substation", "Debra Substation", "Debra GSS Substation", "Gokulpur Substation", "Gopali Substation", "Hijli GSS Substation", "Jharia Substation", "Kalua Brindaban Substation", "Karanda Substation", "Kharagpur GSS Substation", "Madpur Substation", "Nimpura Substation", "Nimpura II Substation", "Pingla Substation", "Pingla(Karkai) GSS Substation", "Sobong Substation", "Uddhabpur Substation", "Vidyasagar Industrial Park 220/132/33 KV Substation", "Vidyasagar Park Substation"],
+    "Midnapur Division": ["Anandapur Substation", "CK Road Substation", "Dharma Substation", "Fulberia Substation", "Garbeta Substation", "Goaltore Substation", "Goaltore 132KV GSS Substation", "Guiadaha Substation", "Hoomgarh Substation", "Joysree Substation", "Keshpur Substation", "Khasjangal Substation", "Midnapur(Darma) GSS Substation", "Pirakata Substation", "Police Line 33/11KV Substation", "Rangamati Substation", "Salboni Substation", "Salboni Solar Power Plant Substation", "Sundargeria Substation"]
+  },
+
+ "Purulia Region": {
+    "Purulia Division": ["Arsa Substation", "Bagmundi Substation", "Balrampur Substation", "Bandwan Substation", "Barabazar Substation", "Jhalda Substation", "Jhalda GSS Substation", "Joypur Substation", "Murulhar 33/11KV Substation", "Purulia Grid Substation", "Purulia Pump Storage Proj. GSS Substation", "Purulia(Bangabari) GSS Substation", "Tamna Substation", "Wilcox Substation"],
+    "Raghunathpur Division": ["Adra Substation", "Anara Substation", "Bhojudih Substation", "Boro Substation", "Charra Substation", "Dumurkhola Substation", "Gobag Substation", "Hura Substation", "Hura GSS Substation", "Kashipur Substation", "Kenda Substation", "Manbazar Substation", "Manbazar GIS Substation", "Puncha Substation", "Raghunathpur GSS Substation", "Raghunathpur(Purulia) Substation", "Santuri Substation", "Sarbari Substation"]
+  },
+
+// Siliguri Zone
+
+
+ "Alipurduar Region": {
+    "Alipurduar Division": ["33/11 KV Aliparduaar GIS Substation", "Alipurduar Substation", "Alipurduar GSS Substation", "Barobhisa Substation", "Birpara GSS Substation", "Damanpur Substation", "Falakata Substation", "Garganda Substation", "Hamiltonganj GSS Substation", "Hashimara GSS Substation", "Jaigaon Substation", "Jasodanga Substation", "Kamakhyaguri GSS Substation", "Kartika Substation", "Kumargram Substation", "Madarihat Substation", "Sonapur GIS Substation"]    
+  },
+
+ "Coochbehar Region": {
+    "Coochbehar Division": ["Baneswar Substation", "Baxirhat Substation", "Chakchaka Substation", "Chilakhana Substation", "Coochbehar (Khagrabari) Substation", "Coochbehar 132 KV Substation", "Coochbehar Power House Substation", "Ghugumari Substation", "Pundibari Substation", "Rustom(APDCL) Substation", "Tufanganj Substation", "Virtual Khamarpara Substation", "Virtual Nayapara Substation"],
+    "Dinhatar Division": ["Balarampur Substation", "Bamanhat Substation", "Dewanhat Substation", "Dinhata Substation", "Dinhata GSS Substation", "Nayarhat Substation", "Petla Substation", "Sitai Substation"],
+    "Mathabhanga Division": ["Akrarhat Substation", "Bhogramguri(Jamalda) Substation", "Changrabandha Substation", "Ghokhsadanga Substation", "Haldibari Substation", "Mathabhanga Substation", "Mathabhangha GSS Substation", "Mekliganj Substation", "Sitalkuchi Substation"]
+  },
+
+ "Darjeeling Region": {
+    "Darjeeling Division": ["Bijanbari Substation", "Darjeeling GSS Substation", "Happy Valley Substation", "Lebong PH Substation", "Lodhama Substation", "New Ghoom Substation", "Old Ghoom Substation", "Pokhriabong Substation", "Rammam GSS Substation", "Singamari Substation", "Takdah Substation"],
+    "Kurseong Division": ["Fazi Power House Substation", "Jogighat Substation", "Kurseong GSS Substation", "Mirik Substation", "Pankhabari Substation", "Sonada Substation"],
+    "Siliguri Division": ["Dabgram Substation", "Deshbandhupara Substation", "Housing Board Substation", "Jhankar Substation", "Purba Karaibari Substation", "Rabindranagar Substation", "Salbari Substation", "Siliguri Substation", "Siliguri GSS Substation", "Subhaspally Substation", "T.B. Hospital Substation", "Tinbatti Substation", "Ujanu Substation", "Ujanu GSS Substation"],
+    "Siliguri Sub-Urban Division": ["Bagdogra Substation", "Bidhannagar Substation", "Embee delight Substation", "Ghoshpukur Substation", "Hatighisha Substation", "Kawakhali Substation", "Khaprail Substation", "Kharibari Substation", "NBU GSS Substation", "PS-1 132/33 KV Substation", "Shantiniketan Substation", "TCF 33/11 kv Substation", "TCF PS II Substation", "Upwan Substation", "Uttora Substation", "Vastu Bihar Substation"]
+  },
+
+ "Jalpaiguri Region": {
+    "Jalpaiguri Division": ["Ambari-Falakata 33/11KV Substation", "Berubari Substation", "Bhotpatty 33/11 KV Substation", "Dhupguri Substation", "Fatapukur Substation", "Fulbari 33/11KV Substation", "Fulbari Industrial Park Substation", "Husludanga Substation", "Jalpaiguri Town 33/11KV Substation", "Mohitnagar Substation", "Mohitnagar 132/33KV Substation", "Moynaguri GSS Substation", "New Jalpaiguri GSS Substation", "Paharpur Substation", "Pandapara Substation", "Radhabari Substation", "Raninagar Substation"],
+    "Mal Division": ["Banarhat GSS Substation", "Chalsa GSS Substation", "Garubathan Substation", "Gayerkata Substation", "Gazoldoba Substation", "Jaldhaka Substation", "Jaldhaka Stage-1 Substation", "Lataguri Substation", "Malbazar Substation", "Nagrakata GSS Substation", "Odlabari GSS Substation"]
+  },
+
+ "Kalimpong Region": {
+    "Kalimpong Division": ["Kalimpong(Hill View) GSS Substation", "Pala Substation", "Pedong Substation"]
+  },
+
+
+// Berhampore Zone
+
+ "Murshidabad Region": {
+    "Berhrampore Division": [ "Amtala GSS Substation", "Banjetia 33/11KV Substation", "Beldanga Substation", "Berhampore Substation", "Berhampore GSS Substation", "Bhabta Substation", "Choa Substation", "Gar Berhampore Substation", "Matrisadan 33/11KV Substation", "Rejinagar Substation", "Rejinagar 220/132/33KV GSS Substation"],
+    "Domkal Division": ["Daulatabad Substation", "Domkal Substation", "Domkal GSS Substation", "Islampur(Goas) 33/11 Substation", "Jalangi Substation", "Raninagar Substation", "Sagarpara Substation"],
+    "Jiaganj Division": ["Azimganj Substation", "Bhagwangola Substation", "Jiaganj Substation", "Lalgola Substation", "Lalgola GSS Substation", "Nabagram Substation", "Nashipur Substation", "Sagardighi GSS Substation", "Lalbagh Substation", "Palsanda Substation"],
+    "Kandi Division": ["Bhabaninagar Substation", "Bharatpur Substation", "Goaljan Substation", "Gokarna Substation", "Kandi Substation", "Khargram Substation", "Kuli Substation", "Kuli 132/33KV GIS Substation", "Panchthupi 33/11KV Substation", "Salar Substation", "Salar GSS Substation", "Shaktipur Substation"],
+    "Raghunathganj Division": ["Ahiran Substation", "Aurangabad(Dafahat) Substation", "Dhulian Substation", "Dhulian GSS Substation", "Farakka Substation", "Gokarna GSS Substation", "Jangipur Substation", "Magha food park 33/11 KV Substation", "Manigram Substation", "Morgram Substation", "New Dhulian Substation", "Raghunathganj Substation", "Raghunathganj GSS Substation", "Sagardighi Substation"],
+  },
+
+ "Nadia Region": {
+    "Kalyani Division": ["Chakdah Substation", "Dharampur 132/33KV Substation", "Haringhata Substation", "Kalyani GSS Substation", "Nagar Ukhra Substation", "Simurali Substation", "Subarnapur Substation", "University Gate Substation", "WBIIDC Phase-2 Substation", "WBIIDC Phase-3 Substation"],
+    "Krishnagar Division": ["Bagula GSS Substation", "Bhajanghat solar Substation", "Krishnaganj Substation", "Krishnagar Substation", "Krishnagar GSS Substation", "Krishnanagar power house Substation", "Sakda Substation", "Usidpur unmanned sub-station Substation", "Mayapur Substation", "Nabadwip town Substation"],
+    "Nakashipara Division": ["Akandaberia (O/D) Substation", "Debagram GSS Substation", "Dhubalia Substation", "Muragacha 33/11KV Substation", "Nakashipara Substation", "Palasi Substation"],
+    "Ranaghat Division": ["Anulia Substation", "Aranghata Substation", "Badkulla Substation", "Birnagar Substation", "Fulia Substation", "Gangnapur Substation", "Ranaghat GSS Substation", "Santipur Substation", "Sutragarh Substation"],
+    "Tehatta Division": [ "Bara andulia Substation", "Barnia Substation", "Chapra Substation", "Chapra GSS Substation", "Karimpur Substation", "Nazirpur Substation", "Nazirpur GSS Substation", "Radhanagar Substation", "Sundalpur Substation", "Tehatta Substation"]
+  },
+
+
+// Malda Zone
+
+ "Uttar Dinajpur Region": {
+    "Islampur Division": ["132 KV P.S. II. TCF. Haftiagach Substation", "Bholagach Substation", "Chopra Substation", "Dalkhola GSS Substation", "Islampur Substation", "Islampur 132/33 KV Substation", "Kahata Substation", "Kanki Substation", "Lodhan Substation", "Panjipara Substation", "Sonapur Substation", "Srikrishnapur Substation", "TCF PS III 132/33 KV Substation"],
+    "Raiganj Division": ["Bangar Substation", "Bikore Substation", "Durgapur Substation", "Hemtabad Substation", "Itahar Substation", "Kaliaganj Substation", "Kasba Substation", "Laxmania Substation", "Malon Substation", "Raiganj GSS Substation", "Raiganj Old Substation", "Tungidighi 33/11 KV Substation"]
+  },
+
+ "Dakshin Dinajpur Region": {
+    "Balurghat Division": ["Amrail Substation", "Balurghat(Mahinagar) GSS Substation", "Baro Raghunathpur Substation", "Laskarhat Substation", "Mahipur Substation", "Patiram Substation", "Rampur Substation", "Salas Substation", "Trimohini Substation"],
+    "Buniadpur Division": ["Buniadpur Substation", "Gangarampur GSS Substation", "Harirampur Substation", "Kushmandi GSS Substation", "Kushmundi Substation", "Maligaon 33/11KV GIS Substation", "Pransagar Substation", "Thangapara 33/11 KV Substation"] 
+  },
+
+ "Malda Region": {
+    "Gazole Division": ["Balia Substation", "Bamangola Substation", "Deotala 33/11 KV Substation", "Gazol Substation", "Gazole 220 KV GSS Substation", "Habibpur Substation", "Habibpur GSS Substation", "Mobarakpur Substation", "Nalagola Substation", "Narayanpur(malda) Substation", "Ranipur o/d Substation", "Riddhi siddhi Substation"],
+    "North Malda Division": ["Ashapur Substation", "Bhakuria Virtual Substation", "Bhaluka Substation", "Chanchal Substation", "Chatrak Substation", "Harishchandrapur Substation", "Harishchandrapur 132 KV GSS Substation", "Pukuria Substation", "Ratua Substation", "Samsi GSS Substation", "Shibnagar Substation", "Tulshihata Temporary Substation"],
+    "South Malda Division": ["Englishbazar Substation", "KPS Substation", "Malda GSS Substation", "Rabindra Bhavan Substation", "Baishnabnagar Substation", "Golapganj Substation", "Kaliachak Substation", "Khejuria GSS Substation", "Manikchak Substation", "Manikchak GSS Substation", "Milky Substation", "Mothabari Substation", "Sujapur Substation"]
+  },
+
+
+
+    };
+
+
+// new: mapping of Zones to their Regions
+const zonesData = {
+  "Kolkata Zone": [
+    "Bidhannagar Region",
+    "North 24 Parganas Region",
+    "South 24 Parganas Region",
+    "Howrah Region"
+  ],
+  "Siliguri Zone": [
+    "Alipurduar Region",
+    "Coochbehar Region",
+    "Darjeeling Region",
+    "Jalpaiguri Region",
+    "Kalimpong Region"
+  ],
+  "Malda Zone": [
+    "Uttar Dinajpur Region",
+    "Dakshin Dinajpur Region",
+    "Malda Region"
+  ],
+  "Berhampore Zone": [
+    "Murshidabad Region",
+    "Nadia Region"
+  ],
+  "Burdwan Zone": [
+    "Birbhum Region",
+    "Burdwan Region",
+    "Hooghly Region",
+    "Paschim Burdwan Region"
+  ],
+  "Midnapur Zone": [
+    "Bankura Region",
+    "Jhargram Region",
+    "Purulia Region",
+    "Purba Medinipur Region",
+    "Paschim Midnapur Region"
+  ]
+};
+
+
+
+
+    const zoneSelect       = document.getElementById("zone");
+const regionSelect     = document.getElementById("region");
+const divisionSelect   = document.getElementById("division");
+const substationSelect = document.getElementById("substation");
+
+function updateRegions() {
+  regionSelect.innerHTML = "";
+  const regions = zonesData[zoneSelect.value] || [];
+  regions.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = r;  opt.text = r;
+    regionSelect.add(opt);
+  });
+  updateDivisions();
+}
+
+function updateDivisions() {
+  divisionSelect.innerHTML   = "";
+  substationSelect.innerHTML = "";
+  const selReg = regionSelect.value;
+  const divs   = data[selReg] ? Object.keys(data[selReg]).sort() : [];
+  divs.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d;  opt.text = d;
+    divisionSelect.add(opt);
+  });
+  updateSubstations();
+}
+
+function updateSubstations() {
+  substationSelect.innerHTML = "";
+  const selReg = regionSelect.value;
+  const selDiv = divisionSelect.value;
+  const subs   = (data[selReg] && data[selReg][selDiv])
+               ? data[selReg][selDiv].sort()
+               : [];
+  subs.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s;  opt.text = s;
+    substationSelect.add(opt);
+  });
+}
+
+// wire up events
+zoneSelect.addEventListener("change", updateRegions);
+regionSelect.addEventListener("change", updateDivisions);
+divisionSelect.addEventListener("change", updateSubstations);
+
+// bootstrap on load
+updateRegions();
+
+    const entryDateInput = document.getElementById("entryDate");
+    const today = new Date().toISOString().split("T")[0];
+    entryDateInput.value = today;
+  </script>
+</body>
+</html>
