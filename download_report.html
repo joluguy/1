@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Download Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-  <style>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=I0HlmkQ6ihBTLIQ5U_JrcdiUfDCejIGFsQ5VdRS8PDzUn_jSww6dn-EOfw65pGRUZlxkS2FEmeSQrtJXA0uX7oiAZEgRl10LKeG2mkTOY9dPXUuAXuAQyYOdW1aeNSoXF8gOCl6rZUIoj4L6BmanSwvhRUIuCNuqMPwt-Towg38HsozE8UmWVWudCLtH3JVDQ8EWx4lm93EoYZaV-71NcyXpuVQHaNCTEWRFhqR20MxTopbVe7xYLY6QsFEjV_Aa" charset="UTF-8"></script>
+<style>
     body {
       margin: 0;
       padding: 0;
@@ -58,10 +59,18 @@
       transform: scale(1.05);
     }
   </style>
+
+  <!-- FileSaver.js for saving files in-browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <!-- html-docx-js to convert HTML → Word (.docx) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.4.1/html-docx.js"></script>
+  <!-- html2pdf.js to convert HTML → PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+
+
 </head>
 <body>
-
-
   <div class="header" id="substationHeader">
     <!-- Substation name will appear here -->
   </div>
@@ -73,88 +82,95 @@
     <button onclick="downloadPDF()">Download Report in PDF</button>
   </div>
 
-   <!-- ▼ REPLACE START: dependencies + fallback ▼ -->
-  <!-- 1) Load all dependencies in order, deferred so they execute after parsing -->
-  <script defer src="https://cdn.jsdelivr.net/npm/docx@8.2.4/build/index.umd.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.13/mammoth.browser.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- REPORT HTML WILL GO IN HERE (empty for now) -->
+  <div id="reportContent" style="display:none;"></div>
 
-  <!-- Fallback to unpkg if jsDelivr failed to load docx -->
+
+
   <script>
-    if (typeof docx === 'undefined') {
-      console.warn('docx @ jsDelivr failed – loading fallback from unpkg');
-      const s = document.createElement('script');
-      s.defer = true;
-      s.src = 'https://unpkg.com/docx@8.2.4/build/index.umd.js';
-      document.head.appendChild(s);
-    }
-  </script>
-  <!-- ▲ REPLACE END ▲ -->
+  // 1) show the substation in the header
+  const substationName = localStorage.getItem("selectedSubstation") || "Report";
+  document.getElementById("substationHeader")
+          .innerText = `Report for '${substationName}'`;
 
-  <!-- ▼ REPLACE START: your custom download logic ▼ -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof docx === 'undefined') {
-        console.error('Unable to load docx – document generation will not work.');
-        return;
-      }
-      const { Document, Paragraph, PageOrientation, PageSize, Packer } = docx;
-      const substationName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
-      document.getElementById("substationHeader")
-              .innerText = `Report for '${substationName}'`;
+  // 2) Download a mobile-compatible Word (.docx) — Legal size, Landscape
+function downloadDoc() {
+  const contentEl = document.getElementById("reportContent");
+  // wrap it in a full HTML document
+  const bodyHTML = contentEl
+    ? contentEl.innerHTML
+    : "";
+  const fullHtml = `
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+      </head>
+      <body>
+        ${bodyHTML}
+      </body>
+    </html>`.trim();
 
-      function createDocument() {
-        return new Document({
-          sections: [{
-            properties: {
-              page: {
-                size: {
-                  orientation: PageOrientation.LANDSCAPE,
-                  width: PageSize.LEGAL.width,
-                  height: PageSize.LEGAL.height
-                }
-              }
-            },
-            children: [ new Paragraph("") ]
-          }]
-        });
-      }
+  let blob;
+  const opts = { orientation: "landscape", pageSize: "LEGAL" };
 
-      // Wire up buttons
-      document.querySelector("button[onclick='downloadDoc()']").onclick = () => {
-        const doc = createDocument();
-        Packer.toBlob(doc)
-          .then(blob => saveAs(blob, `${substationName}.docx`))
-          .catch(err => console.error("Error generating DOCX:", err));
-      };
-
-      document.querySelector("button[onclick='downloadPDF()']").onclick = () => {
-        const doc = createDocument();
-        Packer.toBlob(doc)
-          .then(blob => blob.arrayBuffer())
-          .then(arrayBuffer => mammoth.convertToHtml({ arrayBuffer }))
-          .then(result => {
-            return html2pdf()
-              .from(result.value)
-              .set({
-                margin:      1,
-                filename:    `${substationName}.pdf`,
-                html2canvas: { scale: 2 },
-                jsPDF:       { unit: "in", format: "legal", orientation: "landscape" }
-              })
-              .save();
-          })
-          .catch(err => console.error("Error generating PDF:", err));
-      };
+  // 1️⃣ try html-docx-js conversion
+  try {
+    blob = htmlDocx.asBlob(fullHtml, opts);
+  } catch (err) {
+    console.error("html-docx-js failed:", err);
+    // 2️⃣ fallback to a plain-text blob with the right MIME
+    blob = new Blob([fullHtml], {
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     });
-  </script>
-  <!-- ▲ REPLACE END ▲ -->
+  }
+
+  const filename = `${substationName}.docx`;
+
+  // 3️⃣ try FileSaver.js
+  if (typeof saveAs === "function") {
+    try {
+      saveAs(blob, filename);
+    } catch (e) {
+      console.warn("saveAs failed, falling back to anchor:", e);
+      anchorFallback(blob, filename);
+    }
+  } else {
+    // 4️⃣ anchor fallback
+    anchorFallback(blob, filename);
+  }
+
+  function anchorFallback(b, name) {
+    const url = URL.createObjectURL(b);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+}
 
 
 
+  // 3) Convert that same HTML into PDF — Legal size, Landscape
+  function downloadPDF() {
+    // create a container with your report HTML
+    const container = document.createElement("div");
+    container.innerHTML = document.getElementById("reportContent")?.innerHTML || "";
 
-
+    html2pdf().set({
+      margin:       0.5,                // 0.5in margins
+      filename:     `${substationName}.pdf`,
+      jsPDF:        { unit: "in",
+                      format: "legal",
+                      orientation: "landscape" }
+    })
+    .from(container)
+    .save();
+  }
+</script>
 
 </body>
 </html>
