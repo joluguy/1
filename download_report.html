@@ -73,70 +73,85 @@
     <button onclick="downloadPDF()">Download Report in PDF</button>
   </div>
 
-  <!-- 1) Load docx.js, FileSaver, mammoth and html2pdf -->
-  <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.13/mammoth.browser.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+   <!-- ▼ REPLACE START: dependencies + fallback ▼ -->
+  <!-- 1) Load all dependencies in order, deferred so they execute after parsing -->
+  <script defer src="https://cdn.jsdelivr.net/npm/docx@8.2.4/build/index.umd.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.13/mammoth.browser.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- 2) Your custom download logic -->
+  <!-- Fallback to unpkg if jsDelivr failed to load docx -->
   <script>
-    // – Pull the substation name and show in header
-    const substationName = localStorage.getItem("selectedSubstation") 
-                             || "[Substation Not Set]";
-    document.getElementById("substationHeader")
-            .innerText = `Report for '${substationName}'`;
-
-    // – Build a blank .docx (Legal size, Landscape)
-    function createDocument() {
-      const { Document, Packer, Paragraph, PageOrientation, PageSize } = docx;
-      return new Document({
-        sections: [{
-          properties: {
-            page: {
-              size: {
-                orientation: PageOrientation.LANDSCAPE,
-                width: PageSize.LEGAL.width,
-                height: PageSize.LEGAL.height
-              }
-            }
-          },
-          children: [
-            new Paragraph("")  // placeholder – add your content here later
-          ]
-        }]
-      });
-    }
-
-    // – Download Word (.docx)
-    function downloadDoc() {
-      const doc = createDocument();
-      Packer.toBlob(doc)
-        .then(blob => saveAs(blob, `${substationName}.docx`))
-        .catch(err => console.error("Error generating DOCX:", err));
-    }
-
-    // – Download PDF (converts the same .docx into PDF)
-    function downloadPDF() {
-      const doc = createDocument();
-      Packer.toBlob(doc)
-        .then(blob => blob.arrayBuffer())
-        .then(arrayBuffer => mammoth.convertToHtml({ arrayBuffer }))
-        .then(result => {
-          const html = result.value;
-          return html2pdf()
-            .from(html)
-            .set({
-              margin:      1,
-              filename:    `${substationName}.pdf`,
-              html2canvas: { scale: 2 },
-              jsPDF:       { unit: "in", format: "legal", orientation: "landscape" }
-            })
-            .save();
-        })
-        .catch(err => console.error("Error generating PDF:", err));
+    if (typeof docx === 'undefined') {
+      console.warn('docx @ jsDelivr failed – loading fallback from unpkg');
+      const s = document.createElement('script');
+      s.defer = true;
+      s.src = 'https://unpkg.com/docx@8.2.4/build/index.umd.js';
+      document.head.appendChild(s);
     }
   </script>
+  <!-- ▲ REPLACE END ▲ -->
+
+  <!-- ▼ REPLACE START: your custom download logic ▼ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof docx === 'undefined') {
+        console.error('Unable to load docx – document generation will not work.');
+        return;
+      }
+      const { Document, Paragraph, PageOrientation, PageSize, Packer } = docx;
+      const substationName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
+      document.getElementById("substationHeader")
+              .innerText = `Report for '${substationName}'`;
+
+      function createDocument() {
+        return new Document({
+          sections: [{
+            properties: {
+              page: {
+                size: {
+                  orientation: PageOrientation.LANDSCAPE,
+                  width: PageSize.LEGAL.width,
+                  height: PageSize.LEGAL.height
+                }
+              }
+            },
+            children: [ new Paragraph("") ]
+          }]
+        });
+      }
+
+      // Wire up buttons
+      document.querySelector("button[onclick='downloadDoc()']").onclick = () => {
+        const doc = createDocument();
+        Packer.toBlob(doc)
+          .then(blob => saveAs(blob, `${substationName}.docx`))
+          .catch(err => console.error("Error generating DOCX:", err));
+      };
+
+      document.querySelector("button[onclick='downloadPDF()']").onclick = () => {
+        const doc = createDocument();
+        Packer.toBlob(doc)
+          .then(blob => blob.arrayBuffer())
+          .then(arrayBuffer => mammoth.convertToHtml({ arrayBuffer }))
+          .then(result => {
+            return html2pdf()
+              .from(result.value)
+              .set({
+                margin:      1,
+                filename:    `${substationName}.pdf`,
+                html2canvas: { scale: 2 },
+                jsPDF:       { unit: "in", format: "legal", orientation: "landscape" }
+              })
+              .save();
+          })
+          .catch(err => console.error("Error generating PDF:", err));
+      };
+    });
+  </script>
+  <!-- ▲ REPLACE END ▲ -->
+
+
 
 
 
