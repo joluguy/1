@@ -1911,6 +1911,15 @@ tr.appendChild(actionTd);
       liveTbody.appendChild(buildPanelRow(r, false));
     });
   }
+
+
+// Save info table HTML for download_report page
+const infoTable = document.querySelector('#infoTable');
+if (infoTable) {
+  localStorage.setItem('infoTableHTML', infoTable.outerHTML);
+}
+
+
 }
 
 
