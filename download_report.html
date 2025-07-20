@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Download Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=I0HlmkQ6ihBTLIQ5U_JrcdiUfDCejIGFsQ5VdRS8PDzUn_jSww6dn-EOfw65pGRUZlxkS2FEmeSQrtJXA0uX7oiAZEgRl10LKeG2mkTOY9dPXUuAXuAQyYOdW1aeNSoXF8gOCl6rZUIoj4L6BmanSwvhRUIuCNuqMPwt-Towg38HsozE8UmWVWudCLtH3JVDQ8EWx4lm93EoYZaV-71NcyXpuVQHaNCTEWRFhqR20MxTopbVe7xYLY6QsFEjV_Aa" charset="UTF-8"></script>
-<style>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=l3uJcOjP5GMQUQAwx8jJJGF9nu_ydEDdIOiSiil5Gj_k4nCpf6hMUXn2bCFG5r3es15CGKbfQsMeeJKgh0sSCfm6yYrGhBCUUVrihLFhnVeyZ7c2Vgq_KKiS6AeZNO1zreF1HcRN0gng_qKgE_MejR5biov-g5nMasmKmqcxaMlqfNM0S9OzgY-PCWZCdIXI_DzejmL8y-n84zFl8zDdnDuc-4TI4SceJV1mnVXpkPOIcuRpKIzf5v4zJARwbZes" charset="UTF-8"></script><style>
     body {
       margin: 0;
       padding: 0;
@@ -60,16 +59,24 @@
     }
   </style>
 
-  <!-- FileSaver.js for saving files in-browser -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <!-- html-docx-js to convert HTML → Word (.docx) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.4.1/html-docx.js"></script>
-  <!-- html2pdf.js to convert HTML → PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 
+<!-- NEW -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<!-- pulls in htmlDocx → window.htmlDocx -->
+<script src="https://unpkg.com/html-docx-js@0.3.1/dist/html-docx.js"></script> 
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 
 </head>
+
+
 <body>
   <div class="header" id="substationHeader">
     <!-- Substation name will appear here -->
@@ -82,95 +89,552 @@
     <button onclick="downloadPDF()">Download Report in PDF</button>
   </div>
 
-  <!-- REPORT HTML WILL GO IN HERE (empty for now) -->
-  <div id="reportContent" style="display:none;"></div>
+<script>
+  const subName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
+  document.getElementById('substationHeader').textContent = subName;
 
+  async function downloadDoc() {
+    // 1) build our container
+    const container = document.createElement('div');
 
+// Add Company Heading
+const companyHeadingHTML = localStorage.getItem('companyHeading');
+if (companyHeadingHTML) {
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = companyHeadingHTML;
+  container.appendChild(wrapper);
+}
 
-  <script>
-  // 1) show the substation in the header
-  const substationName = localStorage.getItem("selectedSubstation") || "Report";
-  document.getElementById("substationHeader")
-          .innerText = `Report for '${substationName}'`;
+// Add Info Table
+const infoTableHTML = localStorage.getItem('infoTableHTML');
+if (infoTableHTML) {
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = infoTableHTML;
+  container.appendChild(wrapper);
+}
 
-  // 2) Download a mobile-compatible Word (.docx) — Legal size, Landscape
-function downloadDoc() {
-  const contentEl = document.getElementById("reportContent");
-  // wrap it in a full HTML document
-  const bodyHTML = contentEl
-    ? contentEl.innerHTML
-    : "";
-  const fullHtml = `
-    <!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-      </head>
-      <body>
-        ${bodyHTML}
-      </body>
-    </html>`.trim();
+// Add TEV 11KV Table if available
+const tev11HTML = localStorage.getItem('tevRefs11HTML');
+if (tev11HTML) {
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = tev11HTML;
+  wrapper.style.marginTop = '20px';
+  container.appendChild(wrapper);
+}
 
-  let blob;
-  const opts = { orientation: "landscape", pageSize: "LEGAL" };
-
-  // 1️⃣ try html-docx-js conversion
-  try {
-    blob = htmlDocx.asBlob(fullHtml, opts);
-  } catch (err) {
-    console.error("html-docx-js failed:", err);
-    // 2️⃣ fallback to a plain-text blob with the right MIME
-    blob = new Blob([fullHtml], {
-      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    });
-  }
-
-  const filename = `${substationName}.docx`;
-
-  // 3️⃣ try FileSaver.js
-  if (typeof saveAs === "function") {
-    try {
-      saveAs(blob, filename);
-    } catch (e) {
-      console.warn("saveAs failed, falling back to anchor:", e);
-      anchorFallback(blob, filename);
-    }
-  } else {
-    // 4️⃣ anchor fallback
-    anchorFallback(blob, filename);
-  }
-
-  function anchorFallback(b, name) {
-    const url = URL.createObjectURL(b);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
+// Add TEV 33KV Table if available
+const tev33HTML = localStorage.getItem('tevRefs33HTML');
+if (tev33HTML) {
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = tev33HTML;
+  wrapper.style.marginTop = '20px';
+  container.appendChild(wrapper);
 }
 
 
 
-  // 3) Convert that same HTML into PDF — Legal size, Landscape
-  function downloadPDF() {
-    // create a container with your report HTML
-    const container = document.createElement("div");
-    container.innerHTML = document.getElementById("reportContent")?.innerHTML || "";
 
-    html2pdf().set({
-      margin:       0.5,                // 0.5in margins
-      filename:     `${substationName}.pdf`,
-      jsPDF:        { unit: "in",
-                      format: "legal",
-                      orientation: "landscape" }
-    })
-    .from(container)
-    .save();
+
+
+    // 2) pull in each page’s saved-HTML
+    const sections = [
+      { key: 'controlRoomDocHTML', title: 'Measurement Of Partial Discharge At In-Door Panels, Temperature Recorded and Other Observations' },
+      { key: 'ultrasoundDocHTML',  title: 'Ultrasonic PD Measurement on Outdoor Equipments'   },
+      { key: 'hotspotDocHTML',     title: 'Hotspot Detected by Thermal Imaging Camera'      },
+      { key: 'visualDocHTML',      title: 'Action to be Taken by Division Authority as per Visual Inspection Findings'         }
+    ];
+
+
+for (let { key, title: secTitle } of sections) {
+  if (key !== 'ultrasoundDocHTML') {  // Skip duplicate ultrasound section here
+    const html = localStorage.getItem(key);
+    if (html) {
+      const h2 = document.createElement('h2');
+      h2.textContent = secTitle;
+      container.appendChild(h2);
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html;
+      container.appendChild(wrapper);
+    } else {
+      console.warn(`No data for ${secTitle} (key="${key}")`);
+    }
   }
+}
+
+
+// ── ADD ULTRASOUND LIVE TABLE WITH ROW GROUP COLOURING ──
+const usLiveHTML = localStorage.getItem('ultrasoundLiveTableHTML');
+if (usLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Ultrasonic PD Measurement on Outdoor Equipments';
+  container.appendChild(h2);
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Equipment Details</th>
+          <th>Location</th>
+          <th>R Phase (in dB)</th>
+          <th>Y Phase (in dB)</th>
+          <th>B Phase (in dB)</th>
+          <th>Neutral (in dB)</th>
+          <th>Action to be taken</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${usLiveHTML}
+      </tbody>
+    </table>`;
+
+  const colors = [
+    '#f0f8ff','#fafad2','#e6e6fa','#fff0f5',
+    '#f0fff0','#f5f5f5','#fffaf0','#f5fffa',
+    '#f5f5dc','#f0ffff'
+  ];
+
+  let lastEq = null;
+  let currentEq = null;
+  let colorIndex = -1;
+
+  const rows = wrapper.querySelectorAll('tbody tr');
+
+  rows.forEach(tr => {
+    const eqCell = tr.querySelector('td[rowspan]');
+    if (eqCell) {
+      lastEq = eqCell.textContent;
+      currentEq = null; // Trigger new group colour
+    }
+    if (lastEq !== currentEq) {
+      currentEq = lastEq;
+      colorIndex = (colorIndex + 1) % colors.length;
+    }
+    tr.querySelectorAll('td').forEach(td => {
+      td.style.backgroundColor = colors[colorIndex];
+    });
+  });
+
+  container.appendChild(wrapper);
+}
+
+
+
+
+// ── ADD HOTSPOT LIVE TABLE WITH COLOR CODING ──
+const hsLiveHTML = localStorage.getItem('hotspotLiveTableBody');
+if (hsLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Hotspot Detected by Thermal Imaging Camera';
+  container.appendChild(h2);
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Hotspot Location</th>
+          <th>Ambient Temp (°C)</th>
+          <th>R Phase (°C)</th>
+          <th>Y Phase (°C)</th>
+          <th>B Phase (°C)</th>
+          <th>Neutral (°C)</th>
+          <th>Image Code</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${hsLiveHTML}
+      </tbody>
+    </table>`;
+  
+  // Add color to all rows except header
+  const rows = wrapper.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    row.style.backgroundColor = '#dbe5f1';
+  });
+
+  container.appendChild(wrapper);
+}
+
+
+
+// ── ADD VISUAL FINDINGS LIVE TABLE WITH ROW GROUP COLOURING ──
+const vfLiveHTML = localStorage.getItem('visualLiveTableHTML');
+if (vfLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Action to be Taken by Division Authority as per Visual Inspection Findings';
+  container.appendChild(h2);
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Equipment/Material</th>
+          <th>Action to be taken</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${vfLiveHTML}
+      </tbody>
+    </table>`;
+
+  // Row group colouring logic
+  const colors = [
+    '#f0f8ff', '#fafad2', '#e6e6fa', '#fff0f5', '#f0fff0',
+    '#f5f5f5', '#fffaf0', '#f5fffa', '#f5f5dc', '#f0ffff'
+  ];
+
+  let colorIndex = -1;
+  let lastEquipment = null;
+
+  wrapper.querySelectorAll('tbody tr').forEach(tr => {
+    const equipCell = tr.querySelector('td[rowspan]');
+    if (equipCell) {
+      lastEquipment = equipCell.textContent.trim();
+      colorIndex = (colorIndex + 1) % colors.length;
+    }
+
+    tr.querySelectorAll('td').forEach(td => {
+      td.style.backgroundColor = colors[colorIndex];
+    });
+  });
+
+  container.appendChild(wrapper);
+}
+
+
+
+
+
+
+  // 3) inject your Control-Room export CSS so tables render identically
+  const docxStyle = `
+   <style type="text/css">
+   /* define a “Section1” page of Legal × Landscape */
+   @page Section1 {
+     size: 14in 8.5in;    /* width × height = Legal landscape */
+     margin: 1cm;
+   }
+   /* apply that section to our wrapper DIV */
+   div.Section1 {
+     page: Section1;
+   }
+
+      /* “No Spacing” for all table text */
+      body, p, th, td, div {
+        margin: 0;
+        padding: 0;
+        font-family: Cambria;
+        line-height: 1;
+        mso-style-name: "No Spacing";
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        border: 1px solid #000;
+        padding: 5px;
+      }
+      th {
+        background: #d9d9d9;
+        font-size: 11pt;
+      }
+      td {
+        font-size: 11pt;
+      }
+/* widen “Action to be Taken” and ensure font-size specifically for Control Room Table */
+table:nth-of-type(1) tbody td:last-child {
+  width: 200px !important;
+  font-family: Cambria !important;
+  font-size: 9pt !important;
+}
+
+      /* (keep your other row-background rules here) */
+
+/* Control Panel table rows font size */
+table tbody td {
+    font-size: 10pt !important;
+}
+
+
+
+
+
+
+     /* 11KV & 33KV panels data rows */
+     tr.kv-11 td,
+     tr.kv-33 td {
+       background-color: #dbe5f1 !important;
+     }
+     /* Group‐header rows for 11KV/33KV Panels */
+     tr.kv-header td {
+       background-color: #dbe5f1 !important;
+     }
+     /* Observations header row */
+     tr.obs-header td {
+       background-color: #d9d9d9 !important;
+     }
+
+
+  h2 {
+    font-family: Cambria;
+    font-size: 14pt;
+    text-align: center;
+  }
+
+
+    </style>
+  `;
+
+
+
+  // 4) wrap it all up
+  const fullHtml = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8"/>
+        ${docxStyle}
+      </head>
+      <body>
+      <div class="Section1">
+        ${container.innerHTML}
+      </div>
+    </body>
+   </html>
+  `;
+  // detect mobile UA
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  if (isMobile) {
+    // wrap as Word-HTML for maximum mobile compatibility
+    const wordHtml = `
+      <!DOCTYPE html>
+      <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:w="urn:schemas-microsoft-com:office:word"
+            xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta charset="utf-8"/>
+        <meta name="ProgId" content="Word.Document"/>
+        <title>Condition Monitoring Report</title>
+        <style>
+          body, p, th, td, div { margin:0; padding:0; font-family:Cambria; line-height:1; }
+          table { width:100%; border-collapse:collapse; }
+          th, td { border:1px solid #000; padding:5px; font-size:11pt; }
+          th { background:#d9d9d9; }
+          h1, h2 { text-align:center; font-family:Cambria; }
+        </style>
+      </head>
+      <body>
+        ${container.innerHTML}
+      </body>
+      </html>`;
+
+    const blob = new Blob([wordHtml], { type: 'application/msword' });
+    saveAs(blob, `${subName}-Full-Report.doc`);
+  } else {
+    // desktop: keep using true .docx for best fidelity
+    try {
+      const blob = htmlDocx.asBlob(fullHtml);
+      saveAs(blob, `${subName}-Full-Report.docx`);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to generate DOCX:\n' + e.message);
+    }
+  }
+}
+
+async function downloadPDF() {
+  const subName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
+
+  // Create container similar to downloadDoc
+  const container = document.createElement('div');
+
+  // Add Title
+  const title = document.createElement('h1');
+  title.textContent = `Condition Monitoring Report for ${subName}`;
+  title.style.fontFamily = 'Cambria';
+  title.style.fontSize = '16pt';
+  title.style.fontWeight = 'bold';
+  title.style.textDecoration = 'underline';
+  title.style.textAlign = 'center';
+  title.style.color = 'black';
+
+  container.appendChild(title);
+
+  // Sections from storage (Control Room, Ultrasound, Hotspot, Visual Findings)
+  const sections = [
+    { key: 'controlRoomDocHTML', title: 'Measurement Of Partial Discharge At In-Door Panels, Temperature Recorded and Other Observations' },
+    { key: 'ultrasoundDocHTML',  title: 'Ultrasonic PD Measurement on Outdoor Equipments'   },
+    { key: 'hotspotDocHTML',     title: 'Hotspot Detected by Thermal Imaging Camera'      },
+    { key: 'visualDocHTML',      title: 'Action to be Taken by Division Authority as per Visual Inspection Findings' }
+  ];
+
+for (let { key, title: secTitle } of sections) {
+  if (key !== 'ultrasoundDocHTML') {  // Skip duplicate ultrasound section
+    const html = localStorage.getItem(key);
+    if (html) {
+      const h2 = document.createElement('h2');
+      h2.textContent = secTitle;
+      container.appendChild(h2);
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      Array.from(temp.children).forEach(child => {
+        container.appendChild(child.cloneNode(true));
+      });
+    }
+  }
+}
+
+
+// Include Live tables with proper header rows
+const liveTables = [
+  { key: 'controlRoomLiveTableHTML', title: 'Control Room Live Data' },
+  { key: 'ultrasoundLiveTableHTML', title: 'Ultrasonic PD Measurement on Outdoor Equipments' },
+  { key: 'hotspotLiveTableBody', title: 'Hotspot Detected by Thermal Imaging Camera' },
+  { key: 'visualLiveTableHTML', title: 'Action to be Taken by Division Authority as per Visual Inspection Findings' }
+];
+
+liveTables.forEach(({ key, title }) => {
+  const tableHTML = localStorage.getItem(key);
+  if (tableHTML) {
+    const h2 = document.createElement('h2');
+    h2.textContent = title;
+    container.appendChild(h2);
+
+    const wrapper = document.createElement('div');
+    let tableHeader = '';
+
+    if (key === 'ultrasoundLiveTableHTML') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Equipment Details</th>
+            <th>Location</th>
+            <th>R Phase (in dB)</th>
+            <th>Y Phase (in dB)</th>
+            <th>B Phase (in dB)</th>
+            <th>Neutral (in dB)</th>
+            <th>Action to be taken</th>
+          </tr>
+        </thead>`;
+    } else if (key === 'hotspotLiveTableBody') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Hotspot Location</th>
+            <th>Ambient Temp (°C)</th>
+            <th>R Phase (°C)</th>
+            <th>Y Phase (°C)</th>
+            <th>B Phase (°C)</th>
+            <th>Neutral (°C)</th>
+            <th>Image Code</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>`;
+    } else if (key === 'visualLiveTableHTML') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Equipment/Material</th>
+            <th>Action to be taken</th>
+          </tr>
+        </thead>`;
+    }
+
+wrapper.innerHTML = `<table>${tableHeader}<tbody>${tableHTML}</tbody></table>`;
+
+// Apply row color for Control Room table
+if (key === 'controlRoomLiveTableHTML') {
+  const rows = wrapper.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    row.style.backgroundColor = '#dbe5f1';
+  });
+}
+
+container.appendChild(wrapper);
+
+  }
+});
+
+
+  // Apply identical CSS styles from DOCX to PDF
+  container.style.backgroundColor = "#ffffff";
+  container.style.color = "#000000";
+  container.style.padding = "10px";
+  container.style.fontFamily = "Cambria";
+  container.style.width = "1200px";  // ensures good resolution
+
+  const docxStyle = `
+    <style>
+      body, p, th, td, div { margin:0; padding:0; font-family:Cambria; line-height:1; }
+      table { width:100%; border-collapse:collapse; }
+      th, td { border:1px solid #000; padding:5px; font-size:11pt; }
+      th { background:#d9d9d9; }
+      h1, h2 { text-align:center; }
+    </style>
+  `;
+  container.innerHTML = docxStyle + container.innerHTML;
+
+  document.body.appendChild(container);
+
+
+// Ensure the container is in the DOM and styled properly
+document.body.appendChild(container);
+container.style.position = 'fixed';
+container.style.top = '0';
+container.style.left = '0';
+container.style.zIndex = '9999';
+container.style.background = '#fff';
+
+
+  const { jsPDF } = window.jspdf;
+
+  // PDF generation logic
+  html2canvas(container, { scale: 2 }).then(canvas => {
+    const pdf = new jsPDF('p', 'mm', 'legal'); // Portrait & Legal size
+    const imgData = canvas.toDataURL('image/png');
+
+    const imgWidth = 216; // Legal width in mm
+    const pageHeight = 356; // Legal height in mm
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 10;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`${subName}-Full-Report.pdf`);
+    document.body.removeChild(container);
+  }).catch(e => {
+    alert('Failed to generate PDF:\n' + e.message);
+    document.body.removeChild(container);
+  });
+}
+
+
+  window.downloadDoc = downloadDoc;
+  window.downloadPDF = downloadPDF;
 </script>
+
+
+
+
 
 </body>
 </html>
