@@ -2604,6 +2604,23 @@ const summaryArr = [
           tr.appendChild(tdA);
           liveTbody.appendChild(tr);
         });
+
+
+
+// ── SAVE HEADERS & TEV REFERENCES to localStorage for report export ──
+const headingEl = document.getElementById('companyHeading');
+const infoTableEl = document.getElementById('infoTable');
+const tev11El = document.getElementById('tevRefs11Section');
+const tev33El = document.getElementById('tevRefs33Section');
+
+localStorage.setItem('companyHeading', headingEl?.outerHTML || '');
+localStorage.setItem('infoTableHTML', infoTableEl?.outerHTML || '');
+localStorage.setItem('tevRefs11HTML', tev11El?.outerHTML || '');
+localStorage.setItem('tevRefs33HTML', tev33El?.outerHTML || '');
+
+
+
+
       }
 
      // render in desired order
