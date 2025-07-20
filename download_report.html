@@ -137,6 +137,24 @@ if (infoTableHTML) {
 
 
 
+// ── VERTICAL GAP ──
+const gapDiv = document.createElement('div');
+gapDiv.style.height = '10px';
+container.appendChild(gapDiv);
+
+// ── ADD 11KV TEV REF TABLE ──
+const tev11HTML = localStorage.getItem('tevRefs11HTML');
+if (tev11HTML && tev11HTML.includes('<tr')) {  // only if table has rows
+  const h2 = document.createElement('h2');
+  h2.textContent = '11KV TEV Reference Table';
+  container.appendChild(h2);
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = tev11HTML;
+  container.appendChild(wrapper);
+}
+
+
 
 // ─── INSERT MISSING CONTROL ROOM SECTIONS ───
 // Only insert starting from "companyHeading" and nothing before that
