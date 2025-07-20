@@ -1913,11 +1913,33 @@ tr.appendChild(actionTd);
   }
 
 
-// Save info table HTML for download_report page
+
 const infoTable = document.querySelector('#infoTable');
 if (infoTable) {
+  // Get values from localStorage
+  const zone = localStorage.getItem("selectedZone") || '';
+  const region = localStorage.getItem("selectedRegion") || '';
+  const division = localStorage.getItem("selectedDivision") || '';
+  const substation = localStorage.getItem("selectedSubstation") || '';
+  const date = localStorage.getItem("inspectionDate") || '';
+  const ambient = localStorage.getItem("ambientTemp") || '';
+
+  // Fill the cells using IDs
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+  };
+  setText("infoZone", zone);
+  setText("infoRegion", region);
+  setText("infoDivision", division);
+  setText("infoSubstation", substation);
+  setText("infoInspectionDate", date);
+  setText("infoAmbientTemp", ambient);
+
+  // Save updated table to localStorage
   localStorage.setItem('infoTableHTML', infoTable.outerHTML);
 }
+
 
 
 }
