@@ -97,39 +97,20 @@
     // 1) build our container
     const container = document.createElement('div');
 
-// Add Company Heading
+// ─── INSERT MISSING CONTROL ROOM SECTIONS ───
+// Only insert starting from "companyHeading" and nothing before that
 const companyHeadingHTML = localStorage.getItem('companyHeading');
 if (companyHeadingHTML) {
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = companyHeadingHTML;
-  container.appendChild(wrapper);
+  const div = document.createElement('div');
+  div.innerHTML = companyHeadingHTML;
+  container.appendChild(div);
 }
 
-// Add Info Table
-const infoTableHTML = localStorage.getItem('infoTableHTML');
-if (infoTableHTML) {
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = infoTableHTML;
-  container.appendChild(wrapper);
-}
+// Wait to insert other sections like infoTable and TEV refs **only after** the company heading
 
-// Add TEV 11KV Table if available
-const tev11HTML = localStorage.getItem('tevRefs11HTML');
-if (tev11HTML) {
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = tev11HTML;
-  wrapper.style.marginTop = '20px';
-  container.appendChild(wrapper);
-}
 
-// Add TEV 33KV Table if available
-const tev33HTML = localStorage.getItem('tevRefs33HTML');
-if (tev33HTML) {
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = tev33HTML;
-  wrapper.style.marginTop = '20px';
-  container.appendChild(wrapper);
-}
+
+
 
 
 
@@ -313,84 +294,79 @@ if (vfLiveHTML) {
 
 
   // 3) inject your Control-Room export CSS so tables render identically
-  const docxStyle = `
-   <style type="text/css">
-   /* define a “Section1” page of Legal × Landscape */
-   @page Section1 {
-     size: 14in 8.5in;    /* width × height = Legal landscape */
-     margin: 1cm;
-   }
-   /* apply that section to our wrapper DIV */
-   div.Section1 {
-     page: Section1;
-   }
+const docxStyle = `
+  <style type="text/css">
+    @page Section1 {
+      size: 14in 8.5in;
+      margin: 1cm;
+    }
+    div.Section1 {
+      page: Section1;
+    }
 
-      /* “No Spacing” for all table text */
-      body, p, th, td, div {
-        margin: 0;
-        padding: 0;
-        font-family: Cambria;
-        line-height: 1;
-        mso-style-name: "No Spacing";
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      th, td {
-        border: 1px solid #000;
-        padding: 5px;
-      }
-      th {
-        background: #d9d9d9;
-        font-size: 11pt;
-      }
-      td {
-        font-size: 11pt;
-      }
-/* widen “Action to be Taken” and ensure font-size specifically for Control Room Table */
-table:nth-of-type(1) tbody td:last-child {
-  width: 200px !important;
-  font-family: Cambria !important;
-  font-size: 9pt !important;
-}
+    body, p, th, td, div {
+      margin: 0;
+      padding: 0;
+      font-family: Cambria;
+      line-height: 1;
+      color: black !important; 
+    }
 
-      /* (keep your other row-background rules here) */
-
-/* Control Panel table rows font size */
-table tbody td {
-    font-size: 10pt !important;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
 
+/* Fully remove borders for infoTable using all selectors */
+    #infoTable, 
+    #infoTable * {
+      border: none !important;
+      border-style: none !important;
+      border-width: 0 !important;
+      color: black !important;
+    }
 
 
+    /* Default table style for other tables */
+    th, td {
+      border: 1px solid #000;
+      padding: 5px;
+      font-size: 11pt;
+    }
 
+    th {
+      background: #d9d9d9;
+    }
 
-     /* 11KV & 33KV panels data rows */
-     tr.kv-11 td,
-     tr.kv-33 td {
-       background-color: #dbe5f1 !important;
-     }
-     /* Group‐header rows for 11KV/33KV Panels */
-     tr.kv-header td {
-       background-color: #dbe5f1 !important;
-     }
-     /* Observations header row */
-     tr.obs-header td {
-       background-color: #d9d9d9 !important;
-     }
+    table:nth-of-type(1) tbody td:last-child {
+      width: 200px !important;
+      font-family: Cambria !important;
+      font-size: 9pt !important;
+    }
 
+    table tbody td {
+      font-size: 10pt !important;
+    }
 
-  h2 {
-    font-family: Cambria;
-    font-size: 14pt;
-    text-align: center;
-  }
+    tr.kv-11 td,
+    tr.kv-33 td,
+    tr.kv-header td {
+      background-color: #dbe5f1 !important;
+    }
 
+    tr.obs-header td {
+      background-color: #d9d9d9 !important;
+    }
 
-    </style>
-  `;
+    h2 {
+      font-family: Cambria;
+      font-size: 14pt;
+      text-align: center;
+    }
+  </style>
+`;
+
 
 
 
