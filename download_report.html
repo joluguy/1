@@ -122,6 +122,18 @@ zoneHeading.style.textAlign = 'center';
 zoneHeading.style.margin = '0'; // No spacing as per requirement
 container.appendChild(zoneHeading);
 
+// ── ADD INFO TABLE ──
+const infoTableHTML = localStorage.getItem('infoTableHTML');
+if (infoTableHTML) {
+  const div = document.createElement('div');
+  div.innerHTML = infoTableHTML;
+
+  // Ensure ID is preserved so CSS targets it
+  const table = div.querySelector('#infoTable');
+  if (table) table.id = 'infoTable';
+
+  container.appendChild(div);
+}
 
 
 
