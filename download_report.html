@@ -106,6 +106,33 @@ if (companyHeadingHTML) {
   container.appendChild(div);
 }
 
+
+
+// Add infoTable
+const infoTableHTML = localStorage.getItem('infoTableHTML');
+if (infoTableHTML) {
+  const div = document.createElement('div');
+  div.innerHTML = infoTableHTML;
+  container.appendChild(div);
+}
+
+// Add 11KV TEV Table
+const tev11HTML = localStorage.getItem('tevRefs11HTML');
+if (tev11HTML) {
+  const div = document.createElement('div');
+  div.innerHTML = tev11HTML;
+  container.appendChild(div);
+}
+
+// Add 33KV TEV Table
+const tev33HTML = localStorage.getItem('tevRefs33HTML');
+if (tev33HTML) {
+  const div = document.createElement('div');
+  div.innerHTML = tev33HTML;
+  container.appendChild(div);
+}
+
+
 // Wait to insert other sections like infoTable and TEV refs **only after** the company heading
 
 
