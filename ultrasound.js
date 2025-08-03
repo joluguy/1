@@ -654,7 +654,7 @@ cell.style.minWidth = "80px";            // ensure enough room
     margin:       0.5,
     filename:     `Ultrasound_${substation}_${formattedDate}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 1, backgroundColor: '#ffffff', scrollY: 0, scrollX: 0 },
+    html2canvas:  { scale: 2, backgroundColor: '#ffffff', scrollY: 0, scrollX: 0 },
 
     jsPDF:        { unit: 'in', format: 'legal', orientation: 'landscape' }
   };
@@ -684,4 +684,5 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   // 3. Add one blank row
   addRow();
 });
+
 
