@@ -662,8 +662,44 @@ cell.style.minWidth = "80px";            // ensure enough room
   // Trigger download
 document.body.appendChild(wrapper); // force render
 
-  html2pdf().set(options).from(wrapper).save();
-document.body.removeChild(wrapper); // cleanup
+// Add Note below the table
+const note = document.createElement('div');
+note.innerHTML = `<p style="
+  font-family: Cambria;
+  font-size: 11pt;
+  margin-top: 20px;
+  text-align: left;
+  color: black;">
+  <strong>Note:</strong> This is a draft copy of the ultrasound findings which has been given to the concerned person instantly after the Condition Monitoring. However, the final report shall be sent through e-mail.
+</p>`;
+wrapper.appendChild(note);
+
+
+// Add Watermark - full screen diagonal overlay
+const watermark = document.createElement('div');
+watermark.textContent = 'Draft Copy';
+Object.assign(watermark.style, {
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%) rotate(-45deg)',
+  fontSize: '120px',
+  color: 'rgba(0, 0, 0, 0.08)',
+  fontFamily: 'Cambria',
+  zIndex: 9999,
+  whiteSpace: 'nowrap',
+  pointerEvents: 'none',
+});
+document.body.appendChild(watermark);
+
+
+document.body.appendChild(wrapper); // force render
+
+html2pdf().set(options).from(wrapper).save().then(() => {
+  document.body.removeChild(wrapper);    // cleanup
+  document.body.removeChild(watermark);  // cleanup watermark after download
+});
+
 
 }
 
@@ -684,5 +720,4 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   // 3. Add one blank row
   addRow();
 });
-
 
