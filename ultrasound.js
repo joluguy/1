@@ -651,6 +651,13 @@ const date  = `${day}-${month}-${year}`;
 
 
 
+
+
+
+
+
+
+
 function downloadPdf() {
 renderLive(); // ensure live table is up-to-date
 
@@ -664,22 +671,30 @@ renderLive(); // ensure live table is up-to-date
   // Create a deep clone of the full live table content
   const liveTable = document.getElementById('liveTable');
   const tableClone = liveTable.cloneNode(true);
-  // ── fix column widths so multi-page PDF columns stay aligned ──
-  {
-    // copy the rendered widths of each header cell
-    const origThs = liveTable.querySelectorAll('thead th');
-    // force the clone into a fixed table layout
-    tableClone.style.tableLayout = 'fixed';
-    origThs.forEach((th, idx) => {
-      const w = th.offsetWidth + 'px';
-      // set header cell width on the clone
-      tableClone.querySelectorAll('thead th')[idx].style.width = w;
-      // apply same width to every body cell in that column
-      tableClone.querySelectorAll('tbody tr').forEach(row => {
-        row.children[idx].style.width = w;
-      });
-    });
+// ── Flatten any rowSpan on Equipment cells so each row stands alone ──
+const bodyRows = tableClone.querySelectorAll('tbody tr');
+bodyRows.forEach((tr, idx) => {
+  const spanned = tr.querySelector('td[rowspan]');
+  if (spanned) {
+    const spanCount = parseInt(spanned.getAttribute('rowspan'), 10);
+    const text = spanned.textContent.trim();
+    // reset this cell to span only itself
+    spanned.removeAttribute('rowspan');
+    // duplicate into each following row in the group
+    for (let k = 1; k < spanCount; k++) {
+      const target = bodyRows[idx + k];
+      if (target) {
+       // clone the original cell (with classes & inline styles)
+       const dup = spanned.cloneNode(true);
+       dup.removeAttribute('rowspan');
+        // styling (borders, fonts) will be reapplied later
+        target.insertBefore(dup, target.children[1]);
+      }
+    }
   }
+});
+
+
   const heading = document.createElement('h2');
   heading.textContent = `Ultrasound Findings at ${substation}`;
   heading.style.textAlign = 'center';
@@ -743,24 +758,27 @@ tableClone.querySelectorAll("tr").forEach((row, rowIndex) => {
 
 
   // Add background coloring group-wise like DOC
-  const groupColors = [
-    '#f0f8ff', '#fafad2', '#e6e6fa', '#fff0f5',
-    '#f0fff0', '#f5f5f5', '#fffaf0', '#f5fffa',
-    '#f5f5dc', '#f0ffff'
-  ];
-  let currentEq = null;
-  let colorIndex = -1;
-  const rows = tableClone.querySelectorAll('tbody tr');
-  rows.forEach(tr => {
-    const eqCell = tr.querySelector('td[rowspan]');
-    if (eqCell) {
-      currentEq = eqCell.textContent.trim();
-      colorIndex = (colorIndex + 1) % groupColors.length;
-    }
-    tr.querySelectorAll('td').forEach(td => {
-      td.style.backgroundColor = groupColors[colorIndex];
-    });
+// Add background coloring group-wise like DOC
+const groupColors = [
+  '#f0f8ff', '#fafad2', '#e6e6fa', '#fff0f5',
+  '#f0fff0', '#f5f5f5', '#fffaf0', '#f5fffa',
+  '#f5f5dc', '#f0ffff'
+];
+let currentEq = '';
+let colorIndex = -1;
+const pdfRows = tableClone.querySelectorAll('tbody tr');
+pdfRows.forEach(row => {
+  // equipment name is always in cell 1 once rowSpan is flattened
+  const eqText = row.cells[1].textContent.trim();
+  if (eqText !== currentEq) {
+    currentEq = eqText;
+    colorIndex = (colorIndex + 1) % groupColors.length;
+  }
+  Array.from(row.cells).forEach(cell => {
+    cell.style.backgroundColor = groupColors[colorIndex];
   });
+});
+
 
   const wrapper = document.createElement('div');
   wrapper.style.backgroundColor = 'white';
@@ -772,7 +790,7 @@ tableClone.querySelectorAll("tr").forEach((row, rowIndex) => {
     margin:       0.5,
     filename:     `Ultrasound_${substation}_${formattedDate}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, backgroundColor: '#ffffff' },
+    html2canvas:  { scale: 2, backgroundColor: '#ffffff', scrollY: 0, scrollX: 0 },
 
     jsPDF:        { unit: 'in', format: 'legal', orientation: 'landscape' }
   };
@@ -825,6 +843,8 @@ html2pdf().set(options).from(wrapper).save().then(() => {
 
 
 }
+
+
 
 
 // ——— Enable editing & persistence for live-table cells ———
